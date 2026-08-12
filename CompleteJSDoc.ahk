@@ -663,7 +663,7 @@ GetTypePickerMenu(menuName)
         return [
             {label: "Real", value: "Real", advance: true},
             {label: "String", value: "String", advance: true},
-            {label: "Boolean", value: "Boolean", advance: true},
+            {label: "Bool", value: "Bool", advance: true},
             {label: "Array<>", value: "Array<>", insideBrackets: true},
             {label: "Enum.", value: "Enum."},
             {label: "Struct.", value: "Struct."},

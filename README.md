@@ -49,9 +49,9 @@ The script then enters a field-navigation mode and displays the current field nu
 
 ### Type picker
 
-The type picker opens for parameter and return type fields. It includes common GameMaker types and grouped `Id.`, `Asset.`, and `Constant.` options.
+The type picker opens for parameter and return type fields. It includes common GameMaker types and grouped `Id.`, `Asset.`, and `Constant.` options. See GameMaker's [Feather Data Types](https://manual.gamemaker.io/lts/en/The_Asset_Editors/Code_Editor_Properties/Feather_Data_Types.htm) reference for the complete list of supported type annotations.
 
-Complete types such as `Real`, `String`, and `Boolean` automatically advance to the next field. Types that require more input keep the caret in place. For example, between the brackets in `Array<>` or after `Struct.` and `Enum.`.
+Complete types such as `Real`, `String`, and `Bool` automatically advance to the next field. Types that require more input keep the caret in place. For example, between the brackets in `Array<>` or after `Struct.` and `Enum.`.
 
 ## JSDocGoTo.ahk
 
