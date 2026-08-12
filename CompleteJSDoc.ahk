@@ -522,11 +522,11 @@ SelectJsdocField(field)
 
     if field.visited && SelectEditedJsdocField(
         field,
-        field.position = "param-type"
+        IsTypeField(field)
     ) {
         jsdocCurrentLine := field.line
 
-        if field.position = "param-type"
+        if IsTypeField(field)
             ShowTypePicker()
 
         return
@@ -553,8 +553,14 @@ SelectJsdocField(field)
 
     jsdocCurrentLine := field.line
 
-    if field.position = "param-type"
+    if IsTypeField(field)
         ShowTypePicker()
+}
+
+IsTypeField(field)
+{
+    return field.position = "param-type"
+        || field.position = "return-type"
 }
 
 SelectEditedJsdocField(field, forceSelection := false)
@@ -642,7 +648,7 @@ EnsureTypePicker()
     typePickerList := typePickerGui.Add(
         "ListView",
         "w240 r14 -Hdr -Multi Hidden",
-        ["Parameter type"]
+        ["JSDoc type"]
     )
 
     typePickerList.ModifyCol(1, 215)
