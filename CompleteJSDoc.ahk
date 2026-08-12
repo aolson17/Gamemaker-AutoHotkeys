@@ -1,4 +1,5 @@
-﻿#Requires AutoHotkey v2.0
+/* Made for GameMaker IDE v2024.14.4.222. */
+#Requires AutoHotkey v2.0
 #SingleInstance Force
 #MaxThreadsPerHotkey 1
 
