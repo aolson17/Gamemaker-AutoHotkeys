@@ -6,10 +6,6 @@ SetKeyDelay(-1, -1)
 SetMouseDelay(-1)
 CoordMode("Mouse", "Screen")
 
-/*
- * These hotkeys are active only while GameMaker is the foreground app.
- * Neither hotkey is passed through to GameMaker.
- */
 #HotIf IsGameMakerActive()
 $MButton::HandleMiddleClick()
 $F1::HandleF1()
@@ -19,14 +15,14 @@ HandleMiddleClick()
 {
     MouseGetPos(&mouseX, &mouseY)
 
-    /* A normal left click asks GameMaker to place its text caret here. */
+    /* Put GameMaker's text caret exactly where the middle-click occurred. */
     Click(mouseX, mouseY)
-    Sleep(20)
+    Sleep(75)
 
     if OpenReferenceAtCaret()
         return
 
-    /* No reference was found, so preserve the normal middle-click action. */
+    /* No matching type: preserve GameMaker's normal middle-click behavior. */
     KeyWait("MButton")
     Click(mouseX, mouseY, "Middle")
 }
@@ -36,7 +32,7 @@ HandleF1()
     if OpenReferenceAtCaret()
         return
 
-    /* $F1 prevents this synthetic F1 from invoking the hotkey again. */
+    /* No matching type: preserve GameMaker's normal F1 behavior. */
     KeyWait("F1")
     Send("{F1}")
 }
@@ -58,32 +54,42 @@ OpenReferenceAtCaret()
 GetReferenceAtCaret()
 {
     savedClipboard := ClipboardAll()
+    selectionActive := false
 
     try {
-        /*
-         * Read the text on both sides of the caret. Right/Left collapse each
-         * temporary selection back to the caret, so its position is retained.
-         */
-        A_Clipboard := ""
-        /* Two Home presses reach column zero in GameMaker's editor. */
+        /* Copy everything from the line start through the current caret. */
         Send("+{Home 2}")
-        Send("^c")
-        ClipWait(0.25)
-        textBeforeCaret := A_Clipboard
-        Send("{Right}")
+        selectionActive := true
+        Sleep(35)
 
-        A_Clipboard := ""
+        if !CopySelection(&textBeforeCaret) {
+            Send("{Right}")
+            selectionActive := false
+            return 0
+        }
+
+        Send("{Right}")
+        selectionActive := false
+        Sleep(35)
+
+        /* Copy everything from the current caret through the line end. */
         Send("+{End}")
-        Send("^c")
-        ClipWait(0.25)
-        textAfterCaret := A_Clipboard
+        selectionActive := true
+        Sleep(35)
+
+        if !CopySelection(&textAfterCaret) {
+            Send("{Left}")
+            selectionActive := false
+            return 0
+        }
+
         Send("{Left}")
+        selectionActive := false
 
         lineText := textBeforeCaret . textAfterCaret
         caretOffset := StrLen(textBeforeCaret)
-
-        /* Only enum.Name and struct.Name are valid; matching ignores case. */
         searchAt := 1
+
         while RegExMatch(
             lineText,
             "i)(?<![A-Z0-9_])(enum|struct)\.([A-Z_][A-Z0-9_]*)",
@@ -104,30 +110,71 @@ GetReferenceAtCaret()
         }
     }
     finally {
+        if selectionActive
+            Send("{Left}")
+
         A_Clipboard := savedClipboard
     }
 
     return 0
 }
 
+CopySelection(&copiedText)
+{
+    copiedText := ""
+    A_Clipboard := ""
+    Send("^c")
+
+    if !ClipWait(1)
+        return false
+
+    copiedText := A_Clipboard
+    return true
+}
+
 OpenEnum(enumName)
 {
-    /* GameMaker's Asset Search. */
     Send("^t")
-    Sleep(80)
+    Sleep(400)
+    Send("^a")
+    Sleep(30)
     SendText(enumName)
-    Sleep(20)
-    Send("{Enter}")
+
+    /* Allow Asset Search to finish populating its result list. */
+    Sleep(600)
+
+    /* Move from the Asset Search field to its result, then open it. */
+    SendTabs(1)
+    SendEvent("{Enter}")
 }
 
 OpenStruct(structName)
 {
-    /* Search the project for the struct's function declaration. */
     Send("^+f")
-    Sleep(80)
+    Sleep(400)
+    Send("^a")
+    Sleep(30)
     SendText("function " . structName . "(")
-    Sleep(20)
-    Send("{Enter}")
+    Sleep(250)
+
+    /* Move to Find Next and perform the global search. */
+    SendTabs(8)
+    SendEvent("{Enter}")
+    Sleep(350)
+
+    /* Return focus to Search, leave its text fields, and close the panel. */
+    Send("^+f")
+    Sleep(200)
+    SendTabs(2)
+    SendEvent("{Escape}")
+}
+
+SendTabs(count)
+{
+    Loop count {
+        SendEvent("{Tab}")
+        Sleep(100)
+    }
 }
 
 IsGameMakerActive()
