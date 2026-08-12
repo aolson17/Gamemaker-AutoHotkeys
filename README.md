@@ -22,9 +22,6 @@ On an empty line directly above a function declaration, type:
 
 ```gml
 ///
-function find_node(_tree, _value) {
-    // ...
-}
 ```
 
 Typing the third slash triggers the script. It reads the function declaration and creates:
@@ -34,7 +31,7 @@ Typing the third slash triggers the script. It reads the function declaration an
 - A `@returns` row when the function has a top-level `return` containing a value.
 - A fixed `@return {Struct.FunctionName}` row for constructor functions.
 
-The script enters a field-navigation mode and displays the current field number.
+The script then enters a field-navigation mode and displays the current field number.
 
 ### JSDoc mode hotkeys
 
@@ -48,7 +45,7 @@ The script enters a field-navigation mode and displays the current field number.
 | `Enter` / `Numpad Enter` | Choose the selected type. In a description, create a properly aligned continuation line. |
 | `Space` | Choose the selected type while the picker is open; otherwise type a normal space. |
 | `Escape` | End JSDoc field-navigation mode. |
-| Any mouse button | End JSDoc field-navigation mode. |
+| Any mouse button outside of the picker | End JSDoc field-navigation mode. |
 
 ### Type picker
 
