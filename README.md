@@ -63,7 +63,7 @@ Navigates from JSDoc type references to their GameMaker definitions. Matching is
 Example references:
 
 ```gml
-/// @param {Enum.ABILITIES} _tree The root tree node to search
+/// @param {Enum.ABILITIES} _ability The ability used by the tree
 /// @param {Struct.Tree} _tree The root tree node to search
 ```
 
