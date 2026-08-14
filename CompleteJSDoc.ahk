@@ -15,6 +15,7 @@ global jsdocMode := false
 global jsdocFieldIndex := 0
 global jsdocFields := []
 global jsdocCurrentLine := 0
+global jsdocIndent := ""
 global typePickerVisible := false
 global typePickerGui := 0
 global typePickerStatus := 0
@@ -35,6 +36,7 @@ global jsdocGuiNeedsPosition := true
 CreateSmartJsdoc()
 {
     global jsdocMode, jsdocFieldIndex, jsdocFields, jsdocCurrentLine
+    global jsdocIndent
 
     functionText := GetFollowingCode()
 
@@ -59,7 +61,7 @@ CreateSmartJsdoc()
      */
     if !RegExMatch(
         functionText,
-        "is)^[ \t]*function\s+(\w+)\s*\((.*?)\)\s*(?:(constructor)\s*)?\{",
+        "is)^([ \t]*)function\s+(\w+)\s*\((.*?)\)\s*(?:(constructor)\s*)?\{",
         &signature
     ) {
         SendText("///")
@@ -71,9 +73,10 @@ CreateSmartJsdoc()
         return
     }
 
-    functionName := signature[1]
-    parameterNames := ParseParameterNames(signature[2])
-    isConstructor := signature[3] != ""
+    jsdocIndent := signature[1]
+    functionName := signature[2]
+    parameterNames := ParseParameterNames(signature[3])
+    isConstructor := signature[4] != ""
 
     /* Constructor bodies may contain methods with their own returns. */
     hasReturnValue :=
@@ -83,7 +86,7 @@ CreateSmartJsdoc()
 
     template :=
         "/**`r`n"
-        . " * DESCRIPTION_HERE`r`n"
+        . jsdocIndent " * DESCRIPTION_HERE`r`n"
 
     /*
      * These are the editable fields visited by Tab and Shift+Tab.
@@ -103,7 +106,7 @@ CreateSmartJsdoc()
         descriptionField := "PARAM_DESCRIPTION_" index
 
         template .=
-            " * @param {" typeField "} "
+            jsdocIndent " * @param {" typeField "} "
             . parameterName
             . " " descriptionField
             . "`r`n"
@@ -126,11 +129,11 @@ CreateSmartJsdoc()
 
     if isConstructor {
         template .=
-            " * @return {Struct." functionName "}`r`n"
+            jsdocIndent " * @return {Struct." functionName "}`r`n"
     }
     else if hasReturnValue {
         template .=
-            " * @returns {RETURN_TYPE} RETURN_DESCRIPTION`r`n"
+            jsdocIndent " * @returns {RETURN_TYPE} RETURN_DESCRIPTION`r`n"
 
         returnLine := parameterNames.Length + 3
         jsdocFields.Push({
@@ -149,7 +152,7 @@ CreateSmartJsdoc()
         })
     }
 
-    template .= " */"
+    template .= jsdocIndent " */"
 
     if !PasteText(template)
         return
@@ -401,7 +404,8 @@ GetFollowingCode()
          */
         Send("{Home}")
         Send("{Down}")
-        Send("{Home}")
+        /* Two Home presses include the declaration's leading indentation. */
+        Send("{Home 2}")
         Sleep(30)
 
         /*
@@ -482,7 +486,7 @@ PasteText(text)
 
 SelectJsdocField(field)
 {
-    global jsdocCurrentLine
+    global jsdocCurrentLine, jsdocIndent
 
     /*
      * Use Find only for the first description field. Besides selecting the
@@ -534,13 +538,13 @@ SelectJsdocField(field)
 
     if field.position = "param-type" {
         /* Immediately after: space, *, space, @param, space, {. */
-        Send("{Right 11}")
+        Send("{Right " (StrLen(jsdocIndent) + 11) "}")
         if !field.visited
             Send("+{Right " StrLen(field.token) "}")
     }
     else if field.position = "return-type" {
         /* Immediately after: space, *, space, @returns, space, {. */
-        Send("{Right 13}")
+        Send("{Right " (StrLen(jsdocIndent) + 13) "}")
         if !field.visited
             Send("+{Right " StrLen(field.token) "}")
     }

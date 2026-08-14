@@ -7,8 +7,8 @@ Made for **GameMaker IDE v2024.14.4.222**.
 ## Requirements and setup
 
 1. Install [AutoHotkey v2](https://www.autohotkey.com/).
-2. Run `LaunchGameMakerHotkeys.bat` to start both scripts.
-3. Alternatively, run either `.ahk` file separately if you only need one script.
+2. Run `LaunchGameMakerHotkeys.bat` to start all three scripts.
+3. Alternatively, run any `.ahk` file separately if you only need one script.
 
 Each script uses `#SingleInstance Force`, so launching it again reloads its latest version instead of creating a duplicate instance.
 
@@ -76,3 +76,13 @@ For an enum such as `Enum.ABILITIES`, the script opens Asset Search with `Ctrl+T
 For a struct such as `Struct.Tree`, the script opens Global Search with `Ctrl+Shift+F`, searches for `function Tree(`, enables **Ignore Comments**, selects **Find Next**, and closes the search panel.
 
 The navigation hotkeys are active only while GameMaker is the foreground application.
+
+## ShiftSpaceUnderscore.ahk
+
+Provides a faster way to type underscores while GameMaker is active.
+
+| Hotkey | Action |
+| --- | --- |
+| `Shift+Space` | Type `_` instead of a space. |
+
+The hotkey is active only while GameMaker is the foreground application.

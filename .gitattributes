@@ -1,2 +1,10 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+.gitattributes text eol=lf
+
+# Keep source files consistent on every platform.
+*.ahk text eol=lf
+*.md text eol=lf
+
+# Windows command scripts require Windows-style line endings.
+*.bat text eol=crlf
